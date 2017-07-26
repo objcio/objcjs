@@ -36,6 +36,15 @@ $(function() {
 
 
 
+    // Test if the container is scrollable
+    var containerIsScrollable = function () {
+      var container = $container.get(0);
+      return container.scrollWidth > container.clientWidth;
+    }
+
+
+
+    // Update left/right paging buttons
     var updateButtons = {
 
       // Check whether we’ve hit a boundary and one of the buttons needs to be disabled
@@ -53,14 +62,17 @@ $(function() {
 
       // Hide or show buttons altogether if container doesn't scroll
       presence: function () {
-        var container = $container.get(0);
-        // From MDN:
-        // The Element.scrollWidth read–only property returns either the width in pixels of the content of an element or the width of the element itself, whichever is greater. If the element is wider than its content area (for example, if there are scroll bars for scrolling through the content), the scrollWidth is larger than the clientWidth.
-        var containerIsScrollable = container.scrollWidth > container.clientWidth;
-        // Show or hide the buttons
-        $buttonContainer.toggle(containerIsScrollable);
+        $buttonContainer.toggle(containerIsScrollable());
       }
     };
+
+
+
+    // Update container with selector if it's unscrollable.
+    // This is used to override Kinetic's custom cursor
+    var updateScrollability = function() {
+      $container.toggleClass('is-unscrollable', !containerIsScrollable())
+    }
 
 
 
@@ -87,8 +99,11 @@ $(function() {
     // SET UP
     //
 
-    // 1. Activate scroller, only on horizontal direction
-    $container.kinetic({ y: false });
+    // 1. Activate scroller, only on horizontal direction, only if no touch is present
+    // (this is because kinetic uses touch events and breaks clicks inside)
+    if (!window.App.touchEventsSupported()) {
+      $container.kinetic({ y: false });
+    }
 
     // 2. If buttons are present…
     if ($buttonContainer.length) {
@@ -111,6 +126,12 @@ $(function() {
       }, 100));
       $container.on('scroll', _.debounce(updateButtons.state, 100));
     }
+
+    // 3. Update classes to control appearance based on container being scrollable or not
+    updateScrollability();
+    $(window).on('load orientationchange resize', _.debounce(function () {
+      updateScrollability();
+    }, 100));
 
   });
 
