@@ -7,6 +7,7 @@
     }
     $element = $(element);
     distance = $element.offset().top;
+
     if ($element.is(":hidden")) {
       previous = $element.prevAll(":visible:first");
       if (previous.length > 0) {
@@ -16,7 +17,7 @@
       }
     }
 
-    $('body').animate({
+    $('html, body').animate({
       scrollTop: distance
     }, duration, function() {
       window.location.hash = $element.attr('id') || '';
