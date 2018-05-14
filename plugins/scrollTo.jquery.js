@@ -21,9 +21,6 @@
       scrollTop: distance
     }, duration, function() {
       window.location.hash = $element.attr('id') || '';
-      if ($('.js-header').is('.headroom--not-top.headroom--pinned')) {
-        return $('body').scrollTop($('body').scrollTop() - $('.js-header').outerHeight());
-      }
     });
   };
 
